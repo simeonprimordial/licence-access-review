@@ -1,0 +1,7 @@
+user_id,application,role,permission_level
+U001,GitHub,Developer,standard
+U002,Microsoft 365,Global Administrator,admin
+U003,Slack,Member,standard
+U004,GitHub,Organization Owner,admin
+U005,Slack,Admin,admin
+U006,Microsoft 365,User Administrator,admin

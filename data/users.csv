@@ -1,0 +1,7 @@
+user_id,name,email,department,last_login,status
+U001,John Doe,john@company.com,Engineering,2026-11-10,active
+U002,Jane Smith,jane@company.com,Finance,2026-06-01,active
+U003,David James,david@company.com,HR,2026-07-15,active
+U004,Mary Paul,mary@company.com,Engineering,2026-11-11,active
+U005,Peter Obi,peter@company.com,Marketing,2026-01-10,active
+U006,Grace Allen,grace@company.com,IT,2026-11-12,active

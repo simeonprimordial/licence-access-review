@@ -1,0 +1,8 @@
+licence_id,user_id,application,plan,cost_monthly,currency
+L001,U001,Microsoft 365,Business Premium,20,USD
+L002,U002,Microsoft 365,Business Premium,20,USD
+L003,U003,Slack,Pro,10,USD
+L004,U004,GitHub,Team,4,USD
+L005,U005,Slack,Pro,10,USD
+L006,U006,Microsoft 365,Business Premium,20,USD
+L007,,Microsoft 365,Business Premium,20,USD
