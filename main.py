@@ -1,40 +1,48 @@
 
 from src.data_loader import load_all_data, DataValidationError
+
 from src.licence_audit import (
     run_licence_audit,
     print_licence_summary
 )
 
+from src.access_audit import (
+    run_access_audit,
+    print_access_summary
+)
+
 
 def main():
+
     try:
         users, licences, permissions = load_all_data()
 
-        print("\n=== LICENCE & ACCESS REVIEW ===")
-        print("Data ingestion successful.")
+        print("\n================================")
+        print(" LICENCE & ACCESS REVIEW SYSTEM")
+        print("================================")
 
-        findings = run_licence_audit(
+        print("\nData ingestion successful.")
+
+        # Licence audit
+        licence_findings = run_licence_audit(
             users,
             licences,
             inactive_days=90
         )
 
-        print_licence_summary(findings)
+        print_licence_summary(licence_findings)
 
-        if not findings.empty:
-            print("\n=== DETAILED FINDINGS ===")
-            print(
-                findings[
-                    [
-                        "licence_id",
-                        "name",
-                        "application",
-                        "finding",
-                        "severity",
-                        "review_status"
-                    ]
-                ].to_string(index=False)
-            )
+        # Access audit
+        access_findings = run_access_audit(
+            users,
+            permissions
+        )
+
+        print_access_summary(access_findings)
+
+        print("\n================================")
+        print(" AUDIT EXECUTION COMPLETED")
+        print("================================")
 
     except (FileNotFoundError, DataValidationError) as error:
         print(f"\nAUDIT FAILED: {error}")

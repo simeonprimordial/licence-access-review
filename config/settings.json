@@ -1,6 +1,17 @@
+
 {
   "inactive_days": 90,
   "dormant_admin_days": 30,
   "currency": "USD",
-  "report_format": "xlsx"
+  "report_format": "xlsx",
+  "privileged_roles": [
+    "admin",
+    "global administrator",
+    "organization owner",
+    "user administrator"
+  ],
+  "high_privilege_roles": [
+    "global administrator",
+    "organization owner"
+  ]
 }
