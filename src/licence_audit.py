@@ -90,6 +90,7 @@ def run_licence_audit(
                 "plan": row["plan"],
                 "last_login": row.get("last_login"),
                 "cost_monthly": row["cost_monthly"],
+                "currency": row["currency"],
                 "finding": finding,
                 "severity": severity,
                 "recommendation": recommendation,
@@ -110,17 +111,13 @@ def print_licence_summary(findings):
         print("No licence issues detected.")
         return
 
-    total_monthly = findings["potential_monthly_saving"].sum()
+    for currency, group in findings.groupby("currency"):
 
-    print(
-        f"Potential monthly savings: "
-        f"${total_monthly:,.2f}"
-    )
+        monthly = group["potential_monthly_saving"].sum()
 
-    print(
-        f"Potential annual savings: "
-        f"${total_monthly * 12:,.2f}"
-    )
+    print(f"\nCurrency: {currency}")
+    print(f"Potential monthly savings: {monthly:,.2f}")
+    print(f"Potential annual savings: {monthly * 12:,.2f}")
 
     print("\nFindings by category:")
 

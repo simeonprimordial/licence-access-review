@@ -1,48 +1,55 @@
 
 from src.data_loader import load_all_data, DataValidationError
 
-from src.licence_audit import (
-    run_licence_audit,
-    print_licence_summary
-)
-
-from src.access_audit import (
-    run_access_audit,
-    print_access_summary
-)
+from src.licence_audit import run_licence_audit
+from src.access_audit import run_access_audit
+from src.report_generator import generate_report
 
 
 def main():
 
     try:
+        print("\nStarting monthly access review...")
+
+        # Step 1: Load datasets
         users, licences, permissions = load_all_data()
 
-        print("\n================================")
-        print(" LICENCE & ACCESS REVIEW SYSTEM")
-        print("================================")
+        print("Data ingestion completed.")
 
-        print("\nData ingestion successful.")
-
-        # Licence audit
+        # Step 2: Run licence audit
         licence_findings = run_licence_audit(
             users,
             licences,
             inactive_days=90
         )
 
-        print_licence_summary(licence_findings)
+        print(
+            f"Licence findings: {len(licence_findings)}"
+        )
 
-        # Access audit
+        # Step 3: Run access audit
         access_findings = run_access_audit(
             users,
             permissions
         )
 
-        print_access_summary(access_findings)
+        print(
+            f"Access findings: {len(access_findings)}"
+        )
+
+        # Step 4: Generate Excel report
+        report = generate_report(
+            users,
+            licences,
+            licence_findings,
+            access_findings
+        )
 
         print("\n================================")
-        print(" AUDIT EXECUTION COMPLETED")
+        print(" AUDIT COMPLETED SUCCESSFULLY")
         print("================================")
+
+        print(f"\nReport generated: {report}")
 
     except (FileNotFoundError, DataValidationError) as error:
         print(f"\nAUDIT FAILED: {error}")
