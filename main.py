@@ -1,43 +1,61 @@
 
-from src.data_loader import load_all_data, DataValidationError
+import logging
+import sys
 
+from src.data_loader import load_all_data, DataValidationError
 from src.licence_audit import run_licence_audit
 from src.access_audit import run_access_audit
 from src.report_generator import generate_report
 
 
+logging.basicConfig(
+    filename="logs/monthly_review.log",
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
+
 def main():
 
     try:
-        print("\nStarting monthly access review...")
+        logger.info("Monthly access review started")
 
-        # Step 1: Load datasets
+        # 1. Load datasets
         users, licences, permissions = load_all_data()
 
-        print("Data ingestion completed.")
+        logger.info(
+            "Data loaded: users=%s licences=%s permissions=%s",
+            len(users),
+            len(licences),
+            len(permissions)
+        )
 
-        # Step 2: Run licence audit
+        # 2. Licence audit
         licence_findings = run_licence_audit(
             users,
             licences,
             inactive_days=90
         )
 
-        print(
-            f"Licence findings: {len(licence_findings)}"
+        logger.info(
+            "Licence audit completed: %s findings",
+            len(licence_findings)
         )
 
-        # Step 3: Run access audit
+        # 3. Access audit
         access_findings = run_access_audit(
             users,
             permissions
         )
 
-        print(
-            f"Access findings: {len(access_findings)}"
+        logger.info(
+            "Access audit completed: %s findings",
+            len(access_findings)
         )
 
-        # Step 4: Generate Excel report
+        # 4. Generate report
         report = generate_report(
             users,
             licences,
@@ -45,15 +63,19 @@ def main():
             access_findings
         )
 
-        print("\n================================")
-        print(" AUDIT COMPLETED SUCCESSFULLY")
-        print("================================")
+        logger.info("Report generated: %s", report)
+        logger.info("Monthly access review completed successfully")
 
-        print(f"\nReport generated: {report}")
+        print(f"Audit successful: {report}")
 
-    except (FileNotFoundError, DataValidationError) as error:
-        print(f"\nAUDIT FAILED: {error}")
+    except Exception:
+        logger.exception("Monthly access review failed")
+        raise
 
 
 if __name__ == "__main__":
-    main()
+
+    try:
+        main()
+    except Exception:
+        sys.exit(1)
