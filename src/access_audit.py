@@ -76,6 +76,12 @@ def run_access_audit(users, permissions, as_of=None):
         .to_dict()
     )
 
+    standard_roles = {
+        role.lower()
+        for role in config["standard_roles"]
+    }        
+
+
     for _, row in audit_data.iterrows():
 
         role = row["normalized_role"]
@@ -83,18 +89,39 @@ def run_access_audit(users, permissions, as_of=None):
         severity = "None"
         recommendation = "No action required"
 
-        if role not in privileged_roles:
+        user_status = str(row["status"]).strip().lower()
+
+        if role not in privileged_roles and role not in standard_roles:
+
             finding = "Unclassified role"
             severity = "Medium"
             recommendation = (
                 "Verify this role against the approved access policy"
             )
 
-        else:
-            inactivity = (as_of - row["last_login"]).days
-            user_status = str(row["status"]).strip().lower()
+        elif role in privileged_roles:
 
-            if role in high_privilege_roles:
+            inactivity = (as_of - row["last_login"]).days
+
+            if user_status != "active":
+
+                finding = "Privileged access on inactive account"
+                severity = "Critical"
+                recommendation = (
+                    "Investigate account status and initiate "
+                    "access remediation"
+                )
+
+            elif inactivity >= dormant_days:
+
+                finding = "Dormant administrator"
+                severity = "Critical"
+                recommendation = (
+                    "Investigate inactivity and review privileged access"
+                )
+
+            elif role in high_privilege_roles:
+
                 finding = "Highly privileged account"
                 severity = "High"
                 recommendation = (
@@ -102,26 +129,14 @@ def run_access_audit(users, permissions, as_of=None):
                 )
 
             else:
+
                 finding = "Privileged account"
                 severity = "Medium"
                 recommendation = (
                     "Confirm that administrative access is required"
                 )
 
-            if inactivity >= dormant_days:
-                finding = "Dormant administrator"
-                severity = "Critical"
-                recommendation = (
-                    "Investigate inactivity and review privileged access"
-                )
-
-            if user_status != "active":
-                finding = "Privileged access on inactive account"
-                severity = "Critical"
-                recommendation = (
-                    "Verify account status and initiate access remediation"
-                )
-
+        # Standard roles generate no finding.
         if finding:
 
             findings.append({

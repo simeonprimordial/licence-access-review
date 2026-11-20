@@ -4,6 +4,10 @@
   "dormant_admin_days": 30,
   "currency": "USD",
   "report_format": "xlsx",
+  "standard_roles": [
+    "member",
+    "developer"
+  ],
   "privileged_roles": [
     "admin",
     "global administrator",

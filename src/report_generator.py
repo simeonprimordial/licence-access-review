@@ -1,4 +1,6 @@
 
+import csv
+
 from pathlib import Path
 from datetime import datetime
 
@@ -235,8 +237,46 @@ def generate_report(
         tracker
     )
 
-    output_file = REPORT_DIR / "monthly_access_review.xlsx"
+    # Generate a unique timestamp for this audit.
+    run_timestamp = datetime.now().astimezone()
+
+    timestamp = run_timestamp.strftime("%Y%m%d_%H%M%S")
+
+    output_file = (
+        REPORT_DIR /
+        f"monthly_access_review_{timestamp}.xlsx"
+    )
 
     wb.save(output_file)
+
+    # Maintain a historical audit register.
+    history_file = REPORT_DIR / "audit_history.csv"
+
+    history_record = {
+        "run_timestamp": run_timestamp.isoformat(),
+        "report_file": output_file.name,
+        "users_reviewed": len(users),
+        "licence_findings": len(licence_findings),
+        "access_findings": len(access_findings)
+    }
+
+    file_exists = history_file.exists()
+
+    with open(
+        history_file,
+        "a",
+        newline="",
+        encoding="utf-8"
+    ) as file:
+
+        writer = csv.DictWriter(
+            file,
+            fieldnames=history_record.keys()
+        )
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(history_record)
 
     return output_file
